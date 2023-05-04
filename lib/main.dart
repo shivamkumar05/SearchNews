@@ -9,13 +9,6 @@ import 'download.dart';
 import 'AboutPage.dart';
 import 'history.dart';
 
-// Future main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp();
-
-//   runApp(MyApp());
-// }
-
 void main() {
   runApp(const MyApp());
 }
@@ -49,6 +42,14 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   // Define variables to hold the user's preferred settings
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
   bool isDarkModeEnabled = false;
   String selectedLanguage = 'English';
 
@@ -198,13 +199,6 @@ class _SearchPageState extends State<SearchPage> {
                   title: Text('Downloads'),
                 ),
               ),
-              // const PopupMenuItem<String>(
-              //   // value: 'Bookmarks',
-              //   child: ListTile(
-              //     leading: Icon(Icons.bookmark),
-              //     // title: Text('Bookmarks'),
-              //   ),
-              // ),
               const PopupMenuItem<String>(
                 value: 'Desktop site',
                 child: ListTile(
@@ -275,7 +269,7 @@ class _SearchPageState extends State<SearchPage> {
                 onTap: (() {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
+                    MaterialPageRoute(builder: (context) => ScrapPage()),
                   );
                 }),
                 onSubmitted: (value) {},

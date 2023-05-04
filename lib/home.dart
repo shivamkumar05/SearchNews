@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 56, 105, 142),
+        backgroundColor: const Color.fromARGB(255, 56, 105, 142),
         title: GestureDetector(
           //child: Row(
           //     children: [
@@ -149,9 +149,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-
-
-
 // import 'package:flutter/material.dart';
 // import 'package:chaleno/chaleno.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
@@ -170,103 +167,173 @@ class _HomePageState extends State<HomePage> {
 //   }
 // }
 
-// class ScrapPage extends StatefulWidget {
-//   @override
-//   _ScrapPageState createState() => _ScrapPageState();
-// }
+class ScrapPage extends StatefulWidget {
+  @override
+  _ScrapPageState createState() => _ScrapPageState();
+}
 
-// class _ScrapPageState extends State<ScrapPage> {
-//   final _searchController = TextEditingController();
-//   List<String> _urls = [];
+class _ScrapPageState extends State<ScrapPage> {
+  final _searchController = TextEditingController();
+  List<String> _urls = [];
 
-//   @override
-//   void dispose() {
-//     _searchController.dispose();
-//     super.dispose();
-//   }
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
-//   void _scrapData(String url) async {
-//     var response = await Chaleno().load(url);
+  void _scrapData(String url) async {
+    if (!url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    var response = await Chaleno().load(url);
 
-//     List<Result>? results = response!.getElementsByTagName('a');
-//     var n = results!.length;
+    List<Result>? results = response!.getElementsByTagName('a');
+    var n = results!.length;
 
-//     List<String> urls = [];
+    List<String> urls = [];
 
-//     for (var i = 0; i < n; i++) {
-//       urls.add(results[i].attr('href') ?? '');
-//     }
+    for (var i = 0; i < n; i++) {
+      String href = results[i].attr('href') ?? '';
+      if (href.startsWith('https://')) {
+        urls.add(href);
+      }
+    }
 
-//     setState(() {
-//       _urls = urls;
-//     }
-//     );
-//   }
+    setState(() {
+      _urls = urls;
+    });
+  }
 
-//   void _launchURL(String url) {
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(builder: (context) => WebViewPage(url)),
-//     );
-//   }
+  void _launchURL(String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => WebViewPage(url)),
+    );
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('URL Launcher Demo'),
-//       ),
-//       body: Column(
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: TextField(
-//               controller: _searchController,
-//               decoration: InputDecoration(
-//                 hintText: 'Enter a URL to scrape',
-//                 suffixIcon: IconButton(
-//                   icon: Icon(Icons.search),
-//                   onPressed: () {
-//                     _scrapData(_searchController.text); // Call _scrapData here
-//                   },
-//                 ),
-//               ),
-//             ),
-//           ),
-//           Expanded(
-//             child: ListView.builder(
-//               itemCount: _urls.length,
-//               itemBuilder: (context, index) {
-//                 return ListTile(
-//                   title: Text(_urls[index]),
-//                   onTap: () {
-//                     _launchURL(_urls[index]);
-//                   },
-//                 );
-//               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  String _stripHtmlTags(String html) {
+    RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+    return html.replaceAll(exp, '');
+  }
 
-// class WebViewPage extends StatelessWidget {
-//   final String url;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('URL Launcher Demo'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Enter a URL to scrape',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    _scrapData(_searchController.text); // Call _scrapData here
+                  },
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _urls.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  elevation: 3,
+                  margin: EdgeInsets.all(8),
+                  shadowColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 450,
+                          height: 90,
+                          // width: 10,
+                          child: ListTile(
+                            title: Text(
+                              _urls[index],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: FutureBuilder<String>(
+                              future:
+                                  Chaleno().load(_urls[index]).then((response) {
+                                List<Result>? results =
+                                    response?.getElementsByTagName('meta');
+                                var n = results?.length ?? 0;
 
-//   WebViewPage(this.url);
+                                for (var i = 0; i < n; i++) {
+                                  var name = results![i].attr('name');
+                                  if (name != null &&
+                                      name.toLowerCase() == 'description') {
+                                    String description =
+                                        results[i].attr('content') ?? '';
+                                    return _stripHtmlTags(description);
+                                  }
+                                }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(url),
-//       ),
-//       body: WebView(
-//         initialUrl: url,
-//         javascriptMode: JavascriptMode.unrestricted,
-//       ),
-//     );
-//   }
-// }
+                                return '';
+                              }),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> snapshot) {
+                                if (snapshot.hasData &&
+                                    snapshot.data!.isNotEmpty) {
+                                  String description = snapshot.data!;
+                                  if (description.length > 150) {
+                                    description =
+                                        description.substring(0, 170) + '...';
+                                  }
+                                  return Text(description);
+                                } else {
+                                  return Text('Loading...');
+                                }
+                              },
+                            ),
+                            onTap: () {
+                              _launchURL(_urls[index]);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class WebViewPage extends StatelessWidget {
+  final String url;
+
+  WebViewPage(this.url);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(url),
+      ),
+      body: WebView(
+        initialUrl: url,
+        javascriptMode: JavascriptMode.unrestricted,
+      ),
+    );
+  }
+}

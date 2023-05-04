@@ -98,57 +98,7 @@ class _HomeState extends State<Home> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Container(
-            //   //Search Wala Container
-
-            //   padding: const EdgeInsets.symmetric(horizontal: 8),
-            //   margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            //   decoration: BoxDecoration(
-            //       color: Colors.white, borderRadius: BorderRadius.circular(24)),
-              // child: Row(
-              //   children: [
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     if ((searchController.text).replaceAll(" ", "") == "") {
-                  //       print("Blank search");
-                  //     } else {
-                  //       Navigator.push(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //               builder: (context) => CategoryScreen(
-                  //                     Query: searchController.text,
-                  //                   )));
-                  //     }
-                  //   },
-                  //   child: Container(
-                  //     child: const Icon(
-                  //       Icons.search,
-                  //       color: Colors.blueAccent,
-                  //     ),
-                  //     margin: const EdgeInsets.fromLTRB(3, 0, 7, 0),
-                  //   ),
-                  // ),
-                  // Expanded(
-                  //   child: TextField(
-                  //     controller: searchController,
-                  //     textInputAction: TextInputAction.search,
-                  //     onSubmitted: (value) {
-                  //       //value store input of searchBar
-                  //       Navigator.push(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //               builder: (context) => CategoryScreen(
-                  //                     Query: value,
-                  //                   )));
-                  //     },
-                  //     decoration: const InputDecoration(
-                  //         border: InputBorder.none, hintText: "Search Here"),
-                  //   ),
-                  // )
-            //     ],
-            //   ),
-             //),
-            Container(
+            SizedBox(
                 height: 50,
                 child: ListView.builder(
                     shrinkWrap: true,
